@@ -135,7 +135,6 @@ def rsa_string_decrypt(input_string, key, block_length):
 
     return plaintext
 
-# def rsa_file_encrypt(inp)
 
 
 
@@ -150,7 +149,7 @@ if __name__ == "__main__":
 
     # print('bruh', rsa(72069, pub), rsa(rsa(72069, pub), pri))
 
-    with open('./image.png', 'rb') as f:
+    with open('./test_image.png', 'rb') as f:
         # for line in f:
         #     for byte_value in line:
         #         print(byte_value)
@@ -173,6 +172,8 @@ if __name__ == "__main__":
     # print(plaintext)
 
     print(len(plaintext))
+
+    plaintext = 'haidar'
 
     ciphertext = rsa_string_encrypt(plaintext, pub, 1)
     print(type(ciphertext))
