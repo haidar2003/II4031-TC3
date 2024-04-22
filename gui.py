@@ -36,7 +36,6 @@ def start_encrypting(target64, inputType, input, key, encodingUsed):
     
     if inputType == 'Text': 
             fileContent = rsa_string_encrypt(input, key, 1)
-            cyphertext = str_to_base64(fileContent)
             fileContentIsBinary = False
     else:
         if os.path.splitext(input)[1] == ".txt": #Berarti  -> enkripsi isinya, jangan filenya
@@ -45,8 +44,7 @@ def start_encrypting(target64, inputType, input, key, encodingUsed):
                 plainTextInput = inputFile.read()
             
             fileContent = rsa_string_encrypt(plainTextInput, key, 1)
-            cyphertext = str_to_base64(fileContent)
-            fileContentIsBinary = True
+            fileContentIsBinary = False
 
         else: 
             with open(input,"rb") as inputFile:
@@ -54,8 +52,8 @@ def start_encrypting(target64, inputType, input, key, encodingUsed):
             fileContentIsBinary = True
             plainTextInput = binaryInput.decode(encodingUsed)
             fileContent = rsa_string_encrypt(plainTextInput, key, 1)
-            cyphertext = str_to_base64(fileContent)
     
+    cyphertext = str_to_base64(fileContent)
 
     # DIMUNCULIN DI TEXTBOX
 
@@ -68,7 +66,7 @@ def start_encrypting(target64, inputType, input, key, encodingUsed):
 
     return fileContent, fileContentIsBinary
 
-def start_decrypting(target, target64, inputType, input, key, encodingUsed):
+def start_decrypting(target, inputType, input, key, encodingUsed):
     plaintext = "ERROR"
     fileContent = plaintext
     fileContentIsBinary = False
@@ -77,44 +75,31 @@ def start_decrypting(target, target64, inputType, input, key, encodingUsed):
         return fileContent, fileContentIsBinary
     
     if inputType == 'Text': 
-            fileContent = rc4_text_encrypt(input,key)
-            plaintext = string_to_base64(fileContent)
-            fileContentIsBinary = True
+        fileContent = rsa_string_decrypt(input, key, 1)
+        fileContentIsBinary = False
     else:
         if os.path.splitext(input)[1] == ".txt": #Berarti  -> enkripsi isinya, jangan filenya
             
             with open(input,"r", encoding=encodingUsed) as inputFile:
                 plainTextInput = inputFile.read()
-
-            fileContent = rc4_text_encrypt(plainTextInput,key)
-            plaintext = string_to_base64(fileContent)
-            fileContentIsBinary = True
+            
+            fileContent = rsa_string_decrypt(plainTextInput, key, 1)
+            fileContentIsBinary = False
 
         else: 
             with open(input,"rb") as inputFile:
                 binaryInput = inputFile.read()
             fileContentIsBinary = True
-            fileContent = rc4_bytes_encrypt(binaryInput, key)
-            plaintext = binary_to_base64(fileContent)
-
+            plainTextInput = binaryInput.decode(encodingUsed)
+            fileContent = rsa_string_decrypt(plainTextInput, key, 1)
 
     # DIMUNCULIN DI TEXTBOX
     target.config(state='normal')
     target.delete(1.0, tk.END) 
-
-    target64.config(state='normal')
-    target64.delete(1.0, tk.END) 
-
-    if not(fileContentIsBinary):
-        target.insert(tk.END, fileContent)
-        target64.insert(tk.END, plaintext)
-    else:
-        target.insert(tk.END, fileContent)
-        target64.insert(tk.END, plaintext)  
+    target.insert(tk.END, fileContent)
 
     # BIAR GAK DIGANTI USER
     target.config(state=tk.DISABLED)
-    target64.config(state=tk.DISABLED)
 
     return fileContent, fileContentIsBinary
 
@@ -236,8 +221,10 @@ def main():
     # Nested Functions (We're bad at programming)
     currentFile1 = "Error"
     currentFile2 = "Error"
-    resultContent1 = "Error"
-    resultContent2 = "Error"
+    encryptedUser1 = "Error"
+    encryptedUser2 = "Error"
+    decryptedUser1 = "Error"
+    decryptedUser2 = "Error"
     isResultBinary1 = False
     isResultBinary2 = False
 
@@ -272,59 +259,83 @@ def main():
             else:
                 return currentFile2
             
-    def handle_encrypt(target, target64, inputType, input, key, user):
-        nonlocal resultContent1
-        nonlocal resultContent2
+    def handle_encrypt(target64, inputType, input, key, user):
+        nonlocal encryptedUser1
+        nonlocal encryptedUser2
         nonlocal isResultBinary1
         nonlocal isResultBinary2
         nonlocal defaultEncoding
 
         if user == 1:
-            resultContent1 , isResultBinary1 = start_decrypting(target, target64, inputType, input, key, defaultEncoding)
+            encryptedUser1, isResultBinary1 = start_decrypting(target64, inputType, input, key, defaultEncoding)
         else:
-            resultContent2 , isResultBinary2 = start_decrypting(target, target64, inputType, input, key, defaultEncoding)
+            encryptedUser2, isResultBinary2 = start_decrypting(target64, inputType, input, key, defaultEncoding)
 
-    def handle_decrypt(target, target64, inputType, input, key, user):
-        nonlocal resultContent1
-        nonlocal resultContent2
+    def handle_decrypt(target, inputType, input, key, user):
+        nonlocal decryptedUser1
+        nonlocal decryptedUser2
         nonlocal isResultBinary1
         nonlocal isResultBinary2
         nonlocal defaultEncoding
         
         if user == 1:
-            resultContent1 , isResultBinary1 = start_decrypting(target, target64, inputType, input, key, defaultEncoding)
+            decryptedUser1, isResultBinary1 = start_decrypting(target, inputType, input, key, defaultEncoding)
         else:
-            resultContent2 , isResultBinary2 = start_decrypting(target, target64, inputType, input, key, defaultEncoding)
+            decryptedUser2, isResultBinary2 = start_decrypting(target, inputType, input, key, defaultEncoding)
 
         
-    def on_save_button(user):
-        nonlocal resultContent1
-        nonlocal resultContent2
+    def on_save_button(user, fileContent):
+        nonlocal encryptedUser1
+        nonlocal encryptedUser2
+        nonlocal decryptedUser1
+        nonlocal decryptedUser2
         nonlocal isResultBinary1
         nonlocal isResultBinary2
-        print(1, resultContent1)
-        print(2, resultContent2)
+        print(1, encryptedUser1, encryptedUser2)
+        print(2, decryptedUser1, decryptedUser2)
 
-        if user == 1:
-            if (isResultBinary1):
-                outputFile = filedialog.asksaveasfile(mode="wb",filetypes=[("All files","*.*")])
-            else :
-                outputFile = filedialog.asksaveasfile(mode="wb",defaultextension=".txt",filetypes=[("Text files","*.txt*")])
+        if fileContent == 'encrypt':
+            if user == 1:
+                if (isResultBinary1):
+                    outputFile = filedialog.asksaveasfile(mode="wb",filetypes=[("All files","*.*")])
+                else :
+                    outputFile = filedialog.asksaveasfile(mode="wb",defaultextension=".txt",filetypes=[("Text files","*.txt*")])
 
-            if type(resultContent1) == str:
-                outputFile.write(resultContent1.encode('latin1'))
+                if type(encryptedUser1) == str:
+                    outputFile.write(encryptedUser1.encode('latin1'))
+                else:
+                    outputFile.write(encryptedUser1)
             else:
-                outputFile.write(resultContent1)
-        else:
-            if (isResultBinary2):
-                outputFile = filedialog.asksaveasfile(mode="wb",filetypes=[("All files","*.*")])
-            else :
-                outputFile = filedialog.asksaveasfile(mode="wb",defaultextension=".txt",filetypes=[("Text files","*.txt*")])
+                if (isResultBinary2):
+                    outputFile = filedialog.asksaveasfile(mode="wb",filetypes=[("All files","*.*")])
+                else :
+                    outputFile = filedialog.asksaveasfile(mode="wb",defaultextension=".txt",filetypes=[("Text files","*.txt*")])
 
-            if type(resultContent2) == str:
-                outputFile.write(resultContent2.encode('latin1'))
+                if type(encryptedUser2) == str:
+                    outputFile.write(encryptedUser2.encode('latin1'))
+                else:
+                    outputFile.write(encryptedUser2)
+        elif fileContent == 'decrypt':
+            if user == 1:
+                if (isResultBinary1):
+                    outputFile = filedialog.asksaveasfile(mode="wb",filetypes=[("All files","*.*")])
+                else :
+                    outputFile = filedialog.asksaveasfile(mode="wb",defaultextension=".txt",filetypes=[("Text files","*.txt*")])
+
+                if type(decryptedUser1) == str:
+                    outputFile.write(decryptedUser1.encode('latin1'))
+                else:
+                    outputFile.write(decryptedUser1)
             else:
-                outputFile.write(resultContent2)
+                if (isResultBinary2):
+                    outputFile = filedialog.asksaveasfile(mode="wb",filetypes=[("All files","*.*")])
+                else :
+                    outputFile = filedialog.asksaveasfile(mode="wb",defaultextension=".txt",filetypes=[("Text files","*.txt*")])
+
+                if type(decryptedUser2) == str:
+                    outputFile.write(decryptedUser2.encode('latin1'))
+                else:
+                    outputFile.write(decryptedUser2)
 
 
         
@@ -365,18 +376,18 @@ def main():
     inputLabelInput2.grid(row=6, column=4, pady=5, ipadx = 40)
 
     # Encrypt Button
-    encryptButton1 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox641, inputSelected.get(), handle_input(inputSelected.get()), public_user2))
+    encryptButton1 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox641, inputSelected.get(), handle_input(inputSelected.get()), public_user2, 1))
     encryptButton1.grid(row=8, column=1, pady=3)
 
-    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox642, inputSelected.get(), handle_input(inputSelected.get()), public_user1))
+    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox642, inputSelected.get(), handle_input(inputSelected.get()), public_user1, 2))
     encryptButton2.grid(row=8, column=5, pady=3)
 
     # Decrypt Button
-    encryptButton1 = ttk.Button(window, text="Decrypt", command=lambda: handle_encrypt(textBox641, inputSelected.get(), handle_input(inputSelected.get()), public_user2))
-    encryptButton1.grid(row=10, column=1, pady=3)
+    DecryptButton1 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox1, inputSelected.get(), handle_input(inputSelected.get()), private_user1, 1))
+    DecryptButton1.grid(row=10, column=1, pady=3)
 
-    encryptButton2 = ttk.Button(window, text="Decrypt", command=lambda: handle_encrypt(textBox642, inputSelected.get(), handle_input(inputSelected.get()), public_user1))
-    encryptButton2.grid(row=10, column=5, pady=3)
+    DecryptButton2 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox2, inputSelected.get(), handle_input(inputSelected.get()), private_user2, 2))
+    DecryptButton2.grid(row=10, column=5, pady=3)
 
 
     # USER 1
@@ -414,22 +425,22 @@ def main():
     textLabel = tk.Label(window, text="User 1 Decrypted Text:")
     textLabel.grid(row=11, column=0, pady=5, ipadx = 40)
 
-    textBox1 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
-    textBox1.grid(row=11, column=1, columnspan=2, pady=5, ipadx=40)
+    textBox2 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
+    textBox2.grid(row=11, column=1, columnspan=2, pady=5, ipadx=40)
 
 
     
 
     # Save Button
-    saveButtonMsg1 = ttk.Button(window, text="Save User 1 Encrypted Message", command=lambda: on_save_button(1))
+    saveButtonMsg1 = ttk.Button(window, text="Save User 1 Encrypted Message", command=lambda: on_save_button(1, 'encrypt'))
     saveButtonMsg1.grid(row=12, column=5, pady=10)
-    saveButtonMsg2 = ttk.Button(window, text="Save User 2 Encrypted Message", command=lambda: on_save_button(2))
+    saveButtonMsg2 = ttk.Button(window, text="Save User 2 Encrypted Message", command=lambda: on_save_button(2, 'encrypt'))
     saveButtonMsg2.grid(row=12, column=1, pady=10)
 
     
-    saveButtonDec1 = ttk.Button(window, text="Save User 1 Decrypted Message", command=lambda: on_save_button(1))
+    saveButtonDec1 = ttk.Button(window, text="Save User 1 Decrypted Message", command=lambda: on_save_button(1, 'decrypt'))
     saveButtonDec1.grid(row=12, column=6, pady=10)
-    saveButtonDec2 = ttk.Button(window, text="Save User 2 Decrypted Message", command=lambda: on_save_button(2))
+    saveButtonDec2 = ttk.Button(window, text="Save User 2 Decrypted Message", command=lambda: on_save_button(2, 'decrypt'))
     saveButtonDec2.grid(row=12, column=2, pady=10)
 
     #RUN 
