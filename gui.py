@@ -98,7 +98,7 @@ def main():
     window.title("RSA CHAT GUI")
     defaultEncoding = "latin1"
 
-    window_width = 1400
+    window_width = 1500
     window_height = 800
     
     window.minsize(window_width, window_height)
@@ -371,7 +371,7 @@ def main():
     encryptButton1 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox641, inputSelected1.get(), handle_input(inputSelected1.get(), 1), public_user2, 1))
     encryptButton1.grid(row=8, column=1, pady=3)
 
-    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox642, inputSelected1.get(), handle_input(inputSelected2.get(), 2), public_user1, 2))
+    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox642, inputSelected2.get(), handle_input(inputSelected2.get(), 2), public_user1, 2))
     encryptButton2.grid(row=8, column=5, pady=3)
 
     # Decrypt Button
