@@ -267,9 +267,9 @@ def main():
         nonlocal defaultEncoding
 
         if user == 1:
-            encryptedUser1, isResultBinary1 = start_decrypting(target64, inputType, input, key, defaultEncoding)
+            encryptedUser1, isResultBinary1 = start_encrypting(target64, inputType, input, key, defaultEncoding)
         else:
-            encryptedUser2, isResultBinary2 = start_decrypting(target64, inputType, input, key, defaultEncoding)
+            encryptedUser2, isResultBinary2 = start_encrypting(target64, inputType, input, key, defaultEncoding)
 
     def handle_decrypt(target, inputType, input, key, user):
         nonlocal decryptedUser1
@@ -376,17 +376,17 @@ def main():
     inputLabelInput2.grid(row=6, column=4, pady=5, ipadx = 40)
 
     # Encrypt Button
-    encryptButton1 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox641, inputSelected.get(), handle_input(inputSelected.get()), public_user2, 1))
+    encryptButton1 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox641, inputSelected.get(), handle_input(inputSelected.get(), 1), public_user2, 1))
     encryptButton1.grid(row=8, column=1, pady=3)
 
-    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox642, inputSelected.get(), handle_input(inputSelected.get()), public_user1, 2))
+    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox642, inputSelected.get(), handle_input(inputSelected.get(), 2), public_user1, 2))
     encryptButton2.grid(row=8, column=5, pady=3)
 
     # Decrypt Button
-    DecryptButton1 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox1, inputSelected.get(), handle_input(inputSelected.get()), private_user1, 1))
+    DecryptButton1 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox1, inputSelected.get(), handle_input(inputSelected.get(), 1), private_user1, 1))
     DecryptButton1.grid(row=10, column=1, pady=3)
 
-    DecryptButton2 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox2, inputSelected.get(), handle_input(inputSelected.get()), private_user2, 2))
+    DecryptButton2 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox2, inputSelected.get(), handle_input(inputSelected.get(), 2), private_user2, 2))
     DecryptButton2.grid(row=10, column=5, pady=3)
 
 
