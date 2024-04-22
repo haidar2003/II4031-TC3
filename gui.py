@@ -347,8 +347,8 @@ def main():
     inputTextField2 = ttk.Entry(window, textvariable=inputText2)
 
     # Input File 1 & 2
-    inputUploadButton1 = ttk.Button(window,text= "Upload", command=lambda:uploadFile())
-    inputUploadButton2 = ttk.Button(window,text= "Upload", command=lambda:uploadFile())
+    inputUploadButton1 = ttk.Button(window,text= "Upload", command=lambda:uploadFile(1))
+    inputUploadButton2 = ttk.Button(window,text= "Upload", command=lambda:uploadFile(2))
 
     # Input Selection 1
     inputLabelType1 = tk.Label(window, text="Input Type User 1:")
@@ -384,10 +384,10 @@ def main():
     encryptButton2.grid(row=8, column=5, pady=3)
 
     # Decrypt Button
-    DecryptButton1 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox1, inputSelected1.get(), handle_input(inputSelected1.get(), 1), private_user1, 1))
+    DecryptButton1 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox1, inputSelected1.get(), encryptedUser1, private_user2, 1))
     DecryptButton1.grid(row=10, column=1, pady=3)
 
-    DecryptButton2 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox2, inputSelected2.get(), handle_input(inputSelected2.get(), 2), private_user2, 2))
+    DecryptButton2 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox2, inputSelected2.get(), encryptedUser2, private_user1, 2))
     DecryptButton2.grid(row=10, column=5, pady=3)
 
 
