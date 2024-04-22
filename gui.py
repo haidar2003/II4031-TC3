@@ -373,56 +373,72 @@ def main():
     inputLabelInput2.grid(row=6, column=4, pady=5, ipadx = 40)
 
     # Encrypt Button
-    encryptButton1 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox1, textBox641, inputSelected.get(), handle_input(inputSelected.get()), public_user2))
-    encryptButton1.grid(row=9, column=1, pady=3)
+    encryptButton1 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox641, inputSelected.get(), handle_input(inputSelected.get()), public_user2))
+    encryptButton1.grid(row=8, column=1, pady=3)
 
-    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox2, textBox642, inputSelected.get(), handle_input(inputSelected.get()), public_user1))
-    encryptButton2.grid(row=9, column=5, pady=3)
+    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox642, inputSelected.get(), handle_input(inputSelected.get()), public_user1))
+    encryptButton2.grid(row=8, column=5, pady=3)
+
+    # Decrypt Button
+    encryptButton1 = ttk.Button(window, text="Decrypt", command=lambda: handle_encrypt(textBox641, inputSelected.get(), handle_input(inputSelected.get()), public_user2))
+    encryptButton1.grid(row=10, column=1, pady=3)
+
+    encryptButton2 = ttk.Button(window, text="Decrypt", command=lambda: handle_encrypt(textBox642, inputSelected.get(), handle_input(inputSelected.get()), public_user1))
+    encryptButton2.grid(row=10, column=5, pady=3)
 
 
     # USER 1
-    # Result
-    textLabel = tk.Label(window, text="User 1 Encrypted Text:")
-    textLabel.grid(row=10, column=4, pady=5, ipadx = 40)
-
-    textBox1 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
-    textBox1.grid(row=10, column=5, columnspan=2, pady=5, ipadx=40)
-
     # Result (Base64)
     textLabel = tk.Label(window, text="User 1 Encrypted Text (Base64):")
-    textLabel.grid(row=11, column=4, pady=5, ipadx = 40)
+    textLabel.grid(row=9, column=4, pady=5, ipadx = 40)
 
     textBox641 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
-    textBox641.grid(row=11, column=5, columnspan=2, pady=5, ipadx=40)
+    textBox641.grid(row=9, column=5, columnspan=2, pady=5, ipadx=40)
+
+    # Result User1 Decrypted
+    textLabel = tk.Label(window, text="User 1 Decrypted Text:")
+    textLabel.grid(row=11, column=4, pady=5, ipadx = 40)
+
+    textBox1 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
+    textBox1.grid(row=11, column=5, columnspan=2, pady=5, ipadx=40)
 
 
     # USER 2
-    # Result
-    textLabel = tk.Label(window, text="User 2 Encrypted/Decrypted Text:")
-    textLabel.grid(row=10, column=0, pady=5, ipadx = 40)
+    # # Result
+    # textLabel = tk.Label(window, text="User 2 Encrypted/Decrypted Text:")
+    # textLabel.grid(row=10, column=0, pady=5, ipadx = 40)
 
-    textBox2 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
-    textBox2.grid(row=10, column=1, columnspan=2, pady=5, ipadx=40)
+    # textBox2 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
+    # textBox2.grid(row=10, column=1, columnspan=2, pady=5, ipadx=40)
 
     # Result (Base64)
-    textLabel = tk.Label(window, text="User 2 Encrypted/Decrypted Text (Base64):")
-    textLabel.grid(row=11, column=0, pady=5, ipadx = 40)
+    textLabel = tk.Label(window, text="User 2 Encrypted (Base64):")
+    textLabel.grid(row=9, column=0, pady=5, ipadx = 40)
 
     textBox642 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
-    textBox642.grid(row=11, column=1, columnspan=2, pady=5, ipadx=40)
+    textBox642.grid(row=9, column=1, columnspan=2, pady=5, ipadx=40)
 
+    # Result User2 Decrypted
+    textLabel = tk.Label(window, text="User 1 Decrypted Text:")
+    textLabel.grid(row=11, column=0, pady=5, ipadx = 40)
+
+    textBox1 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
+    textBox1.grid(row=11, column=1, columnspan=2, pady=5, ipadx=40)
+
+
+    
 
     # Save Button
     saveButtonMsg1 = ttk.Button(window, text="Save User 1 Encrypted Message", command=lambda: on_save_button(1))
-    saveButtonMsg1.grid(row=12, column=1, pady=10)
+    saveButtonMsg1.grid(row=12, column=5, pady=10)
     saveButtonMsg2 = ttk.Button(window, text="Save User 2 Encrypted Message", command=lambda: on_save_button(2))
-    saveButtonMsg2.grid(row=12, column=5, pady=10)
+    saveButtonMsg2.grid(row=12, column=1, pady=10)
 
     
     saveButtonDec1 = ttk.Button(window, text="Save User 1 Decrypted Message", command=lambda: on_save_button(1))
-    saveButtonDec1.grid(row=12, column=1, pady=10)
+    saveButtonDec1.grid(row=12, column=6, pady=10)
     saveButtonDec2 = ttk.Button(window, text="Save User 2 Decrypted Message", command=lambda: on_save_button(2))
-    saveButtonDec2.grid(row=12, column=5, pady=10)
+    saveButtonDec2.grid(row=12, column=2, pady=10)
 
     #RUN 
     window.mainloop()
