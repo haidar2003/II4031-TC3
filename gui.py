@@ -133,7 +133,7 @@ def main():
     window.title("RSA CHAT GUI")
     defaultEncoding = "latin1"
 
-    window_width =1200
+    window_width = 1400
     window_height = 800
     
     window.minsize(window_width, window_height)
@@ -202,7 +202,10 @@ def main():
 
 
     fileLabel = tk.Label(window, text='')
-    fileLabel.grid(row=7, column=1, pady=15, ipadx = 40)
+    fileLabel.grid(row=7, column=5, pady=15, ipadx = 40)
+
+    fileLabe2 = tk.Label(window, text='')
+    fileLabe2.grid(row=7, column=5, pady=15, ipadx = 40)
 
     # USER 1
     keyLabel = tk.Label(window, text="User 1")
@@ -254,12 +257,13 @@ def main():
 
         filename = filedialog.askopenfilename()
 
-        fileLabel = tk.Label(window, text=filename)
-        fileLabel.grid(row=7, column=1, pady=15, ipadx = 40)
-
         if user == 1:
+            fileLabel1 = tk.Label(window, text=filename)
+            fileLabel1.grid(row=7, column=1, pady=15, ipadx = 40)
             currentFile1 = filename
         else:
+            fileLabel2 = tk.Label(window, text=filename)
+            fileLabel2.grid(row=7, column=5, pady=15, ipadx = 40)
             currentFile2 = filename
 
     def handle_input(inputType, user):
@@ -271,7 +275,7 @@ def main():
             else:
                 return inputText2.get()
         else:
-            if user == 1:
+            if user == 2:
                 return currentFile1
             else:
                 return currentFile2
@@ -336,7 +340,7 @@ def main():
     inputText1 = tk.StringVar()
     inputTextField1 = ttk.Entry(window, textvariable=inputText1)
     inputText2 = tk.StringVar()
-    inputTextField1 = ttk.Entry(window, textvariable=inputText2)
+    inputTextField2 = ttk.Entry(window, textvariable=inputText2)
 
     # Input File 1 & 2
     inputUploadButton1 = ttk.Button(window,text= "Upload", command=lambda:uploadFile())
@@ -352,47 +356,67 @@ def main():
     inputSelection2_1 = ttk.Radiobutton(window, text=inputList[1], variable= inputSelected, value=inputList[1], command=lambda: (on_input_type_change(inputTextField1,inputUploadButton1), inputUploadButton1.grid(row=6, column=1, pady=15, ipadx = 40)))
     inputSelection2_1.grid(row=5, column=1, pady=15)
 
-    inputLabelInput1 = tk.Label(window, text="Input:")
+    inputLabelInput1 = tk.Label(window, text="Input User 1:")
     inputLabelInput1.grid(row=6, column=0, pady=5, ipadx = 40)
 
-    # Input Selection 1
+    # Input Selection 2
     inputLabelType1 = tk.Label(window, text="Input Type User 2:")
     inputLabelType1.grid(row=4, column=4, pady=10)
     inputSelected = tk.StringVar()
     inputList = ["Text", "File" ]
-    inputSelection1_2 = ttk.Radiobutton(window, text=inputList[0], variable= inputSelected, value=inputList[0], command=lambda: (on_input_type_change(inputUploadButton1,inputTextField1), inputTextField1.grid(row=6, column=1, pady=15, ipadx = 40), reset_label(window)))
+    inputSelection1_2 = ttk.Radiobutton(window, text=inputList[0], variable= inputSelected, value=inputList[0], command=lambda: (on_input_type_change(inputUploadButton2,inputTextField2), inputTextField2.grid(row=6, column=5, pady=15, ipadx = 40), reset_label(window)))
     inputSelection1_2.grid(row=4, column=5, pady=10)
-    inputSelection2_2 = ttk.Radiobutton(window, text=inputList[1], variable= inputSelected, value=inputList[1], command=lambda: (on_input_type_change(inputTextField1,inputUploadButton1), inputUploadButton1.grid(row=6, column=1, pady=15, ipadx = 40)))
+    inputSelection2_2 = ttk.Radiobutton(window, text=inputList[1], variable= inputSelected, value=inputList[1], command=lambda: (on_input_type_change(inputTextField2,inputUploadButton2), inputUploadButton2.grid(row=6, column=5, pady=15, ipadx = 40)))
     inputSelection2_2.grid(row=5, column=5, pady=15)
 
-    inputLabelInput1 = tk.Label(window, text="Input:")
-    inputLabelInput1.grid(row=6, column=0, pady=5, ipadx = 40)
-
-    # Result
-    textLabel = tk.Label(window, text="Your Encrypted Text:")
-    textLabel.grid(row=10, column=0, pady=5, ipadx = 40)
-
-    textBox = tk.Text(window, state=tk.DISABLED, height=10, width=20)
-    textBox.grid(row=10, column=1, columnspan=2, pady=5, ipadx=40)
-
-    # Result (Base64)
-    textLabel = tk.Label(window, text="Your Encrypted/Decrypted Text (Base64):")
-    textLabel.grid(row=11, column=0, pady=5, ipadx = 40)
-
-    textBox64 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
-    textBox64.grid(row=11, column=1, columnspan=2, pady=5, ipadx=40)
+    inputLabelInput2 = tk.Label(window, text="Input User 2:")
+    inputLabelInput2.grid(row=6, column=4, pady=5, ipadx = 40)
 
     # Encrypt Button
-    encryptButton = ttk.Button(window, text="Encrypt", command=lambda: handle_encrypt(textBox, textBox64, inputSelected.get(), handle_input(inputSelected.get()), key.get()))
-    encryptButton.grid(row=8, column=1, pady=3)
+    encryptButton1 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox, textBox64, inputSelected.get(), handle_input(inputSelected.get()), key.get()))
+    encryptButton1.grid(row=9, column=1, pady=3)
 
-    # Decrypt Button
-    decryptButton = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox, textBox64, inputSelected.get(), handle_input(inputSelected.get()), key.get()))
-    decryptButton.grid(row=9, column=1, pady=3)
+    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox, textBox64, inputSelected.get(), handle_input(inputSelected.get()), key.get()))
+    encryptButton2.grid(row=9, column=5, pady=3)
+
+
+    # USER 1
+    # Result
+    textLabel = tk.Label(window, text="User 1 Encrypted Text:")
+    textLabel.grid(row=10, column=4, pady=5, ipadx = 40)
+
+    textBox1 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
+    textBox1.grid(row=10, column=5, columnspan=2, pady=5, ipadx=40)
+
+    # Result (Base64)
+    textLabel = tk.Label(window, text="User 1 Encrypted Text (Base64):")
+    textLabel.grid(row=11, column=4, pady=5, ipadx = 40)
+
+    textBox641 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
+    textBox641.grid(row=11, column=5, columnspan=2, pady=5, ipadx=40)
+
+
+    # USER 2
+    # Result
+    textLabel = tk.Label(window, text="User 2 Encrypted Text:")
+    textLabel.grid(row=10, column=0, pady=5, ipadx = 40)
+
+    textBox2 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
+    textBox2.grid(row=10, column=1, columnspan=2, pady=5, ipadx=40)
+
+    # Result (Base64)
+    textLabel = tk.Label(window, text="User 2 Encrypted Text (Base64):")
+    textLabel.grid(row=11, column=0, pady=5, ipadx = 40)
+
+    textBox642 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
+    textBox642.grid(row=11, column=1, columnspan=2, pady=5, ipadx=40)
+
 
     # Save Button
-    saveButton = ttk.Button(window, text="Save File", command=lambda: on_save_button())
-    saveButton.grid(row=12, column=1, pady=10)
+    saveButton1 = ttk.Button(window, text="Save User 1 Encrypted Message", command=lambda: on_save_button(1))
+    saveButton1.grid(row=12, column=1, pady=10)
+    saveButton2 = ttk.Button(window, text="Save User 2 Encrypted Message", command=lambda: on_save_button(2))
+    saveButton2.grid(row=12, column=5, pady=10)
 
     #RUN 
     window.mainloop()
