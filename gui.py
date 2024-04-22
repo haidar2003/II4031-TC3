@@ -98,7 +98,7 @@ def main():
     window.title("RSA CHAT GUI")
     defaultEncoding = "latin1"
 
-    window_width = 1600
+    window_width = 1550
     window_height = 800
     
     window.minsize(window_width, window_height)
@@ -117,11 +117,11 @@ def main():
     user1_know = False
     user2_know = False
 
-    keyLabel = tk.Label(window, text="User 1 belum mempunyai key")
-    keyLabel.grid(row=0, column=1, pady=10)
+    keyLabel = tk.Label(window, text="User 1 Belum Mempunyai Key")
+    keyLabel.grid(row=13, column=1, pady=10)
 
-    keyLabel = tk.Label(window, text="User 2 belum mempunyai key")
-    keyLabel.grid(row=0, column=5, pady=10)
+    keyLabel = tk.Label(window, text="User 2 Belum Mempunyai Key")
+    keyLabel.grid(row=13, column=5, pady=10)
 
     def keyGen(user):
         nonlocal private_user1
@@ -146,8 +146,11 @@ def main():
             formatted_pub = f"PUB|e:{pub_exponent}|n:{pub_modulus}"
             formatted_pri = f"PRI|d:{pri_exponent}|n:{pri_modulus}"
 
-            keyLabel = tk.Label(window, text=f"{formatted_pub} - {formatted_pri}")
-            keyLabel.grid(row=0, column=1, pady=10)
+            keyLabel = tk.Label(window, text=f"{formatted_pub}")
+            keyLabel.grid(row=13, column=1, padx=0, pady=10)
+
+            keyLabel = tk.Label(window, text=f"{formatted_pri}")
+            keyLabel.grid(row=13, column=2, padx=0, pady=10)
 
         elif user == 2:
             public_user2, private_user2 = generate_key(10, 10000000)
@@ -164,8 +167,11 @@ def main():
             formatted_pub = f"PUB|e:{pub_exponent}|n:{pub_modulus}"
             formatted_pri = f"PRI|d:{pri_exponent}|n:{pri_modulus}"
 
-            keyLabel = tk.Label(window, text=f"{formatted_pub} - {formatted_pri}")
-            keyLabel.grid(row=0, column=5, pady=10)
+            keyLabel = tk.Label(window, text=f"{formatted_pub}")
+            keyLabel.grid(row=13, column=5, padx=0, pady=10)
+
+            keyLabel = tk.Label(window, text=f"{formatted_pri}")
+            keyLabel.grid(row=13, column=6, padx=0, pady=10)
 
     def sendKey(user):
         nonlocal user1_know
