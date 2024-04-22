@@ -26,7 +26,7 @@ def reset_label(window):
     fileLabel = tk.Label(window, text='                                                                                              ')
     fileLabel.grid(row=7, column=1, pady=15, ipadx = 40)
 
-def start_encrypting(target, target64, inputType, input, key, encodingUsed):
+def start_encrypting(target64, inputType, input, key, encodingUsed):
     cyphertext = "ERROR"
     fileContent = cyphertext
     fileContentIsBinary = False
@@ -35,43 +35,35 @@ def start_encrypting(target, target64, inputType, input, key, encodingUsed):
         return fileContent, fileContentIsBinary
     
     if inputType == 'Text': 
-            fileContent = rc4_text_encrypt(input,key)
-            cyphertext = string_to_base64(fileContent)
-            fileContentIsBinary = True
+            fileContent = rsa_string_encrypt(input, key, 1)
+            cyphertext = str_to_base64(fileContent)
+            fileContentIsBinary = False
     else:
         if os.path.splitext(input)[1] == ".txt": #Berarti  -> enkripsi isinya, jangan filenya
             
             with open(input,"r", encoding=encodingUsed) as inputFile:
                 plainTextInput = inputFile.read()
             
-            fileContent = rc4_text_encrypt(plainTextInput,key)
-            cyphertext = string_to_base64(fileContent)
+            fileContent = rsa_string_encrypt(plainTextInput, key, 1)
+            cyphertext = str_to_base64(fileContent)
             fileContentIsBinary = True
 
         else: 
             with open(input,"rb") as inputFile:
                 binaryInput = inputFile.read()
             fileContentIsBinary = True
-            fileContent = rc4_bytes_encrypt(binaryInput, key)
-            cyphertext = binary_to_base64(fileContent)
+            plainTextInput = binaryInput.decode(encodingUsed)
+            fileContent = rsa_string_encrypt(plainTextInput, key, 1)
+            cyphertext = str_to_base64(fileContent)
     
 
     # DIMUNCULIN DI TEXTBOX
-    target.config(state='normal')
-    target.delete(1.0, tk.END) 
 
     target64.config(state='normal')
     target64.delete(1.0, tk.END) 
-
-    if not(fileContentIsBinary):
-        target.insert(tk.END, fileContent)
-        target64.insert(tk.END, cyphertext)
-    else:
-        target.insert(tk.END, fileContent)
-        target64.insert(tk.END, cyphertext)  
+    target64.insert(tk.END, cyphertext)
 
     # BIAR GAK DIGANTI USER
-    target.config(state=tk.DISABLED)
     target64.config(state=tk.DISABLED)
 
     return fileContent, fileContentIsBinary
