@@ -74,24 +74,12 @@ def start_decrypting(target, inputType, input, key, encodingUsed):
     if (len(input) == 0 or len(key) == 0):
         return fileContent, fileContentIsBinary
     
+    fileContent = rsa_string_decrypt(input, key, 1)
+    
     if inputType == 'Text': 
-        fileContent = rsa_string_decrypt(input, key, 1)
         fileContentIsBinary = False
     else:
-        if os.path.splitext(input)[1] == ".txt": #Berarti  -> enkripsi isinya, jangan filenya
-            
-            with open(input,"r", encoding=encodingUsed) as inputFile:
-                plainTextInput = inputFile.read()
-            
-            fileContent = rsa_string_decrypt(plainTextInput, key, 1)
-            fileContentIsBinary = False
-
-        else: 
-            with open(input,"rb") as inputFile:
-                binaryInput = inputFile.read()
-            fileContentIsBinary = True
-            plainTextInput = binaryInput.decode(encodingUsed)
-            fileContent = rsa_string_decrypt(plainTextInput, key, 1)
+        fileContentIsBinary = True
 
     # DIMUNCULIN DI TEXTBOX
     target.config(state='normal')
@@ -388,10 +376,10 @@ def main():
 
     # Decrypt Button
     DecryptButton1 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox1, inputSelected1.get(), encryptedUser1, private_user2, 1))
-    DecryptButton1.grid(row=10, column=1, pady=3)
+    DecryptButton1.grid(row=10, column=5, pady=3)
 
     DecryptButton2 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox2, inputSelected2.get(), encryptedUser2, private_user1, 2))
-    DecryptButton2.grid(row=10, column=5, pady=3)
+    DecryptButton2.grid(row=10, column=1, pady=3)
 
 
     # USER 1
@@ -426,7 +414,7 @@ def main():
     textBox642.grid(row=9, column=1, columnspan=2, pady=5, ipadx=40)
 
     # Result User2 Decrypted
-    textLabel = tk.Label(window, text="User 1 Decrypted Text:")
+    textLabel = tk.Label(window, text="User 2 Decrypted Text:")
     textLabel.grid(row=11, column=0, pady=5, ipadx = 40)
 
     textBox2 = tk.Text(window, state=tk.DISABLED, height=10, width=20)
