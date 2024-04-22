@@ -197,7 +197,7 @@ def main():
     sendKeyButton.grid(row=1, column=2, padx = 5, pady=11)
     savePubButton = ttk.Button(window, text="Save Public Key", command=lambda: save_public(1))
     savePubButton.grid(row=2, column=1, padx = 5, pady=12)
-    savePriButton = ttk.Button(window, text="Save Public Key", command=lambda: save_private(1))
+    savePriButton = ttk.Button(window, text="Save Private Key", command=lambda: save_private(1))
     savePriButton.grid(row=2, column=2, padx = 5, pady=12)
     
     # USER 2
@@ -213,7 +213,7 @@ def main():
     sendKeyButton.grid(row=1, column=6, padx = 5, pady=11)
     savePubButton = ttk.Button(window, text="Save Public Key", command=lambda: save_public(2))
     savePubButton.grid(row=2, column=5, padx = 5, pady=12)
-    savePriButton = ttk.Button(window, text="Save Public Key", command=lambda: save_private(2))
+    savePriButton = ttk.Button(window, text="Save Private Key", command=lambda: save_private(2))
     savePriButton.grid(row=2, column=6, padx = 5, pady=12)
 
     
@@ -229,6 +229,7 @@ def main():
     isResultBinary2 = False
 
     def uploadFile(user): 
+        print(f'UPLOAD FILE {user}')
         nonlocal currentFile1
         nonlocal currentFile2
         nonlocal window
@@ -248,13 +249,15 @@ def main():
     def handle_input(inputType, user):
         nonlocal currentFile1
         nonlocal currentFile2
+
+        print(currentFile1, currentFile2)
         if inputType == 'Text':
             if user == 1:
                 return inputText1.get()
             else:
                 return inputText2.get()
         else:
-            if user == 2:
+            if user == 1:
                 return currentFile1
             else:
                 return currentFile2
@@ -347,8 +350,8 @@ def main():
     inputTextField2 = ttk.Entry(window, textvariable=inputText2)
 
     # Input File 1 & 2
-    inputUploadButton1 = ttk.Button(window,text= "Upload", command=lambda:uploadFile(1))
-    inputUploadButton2 = ttk.Button(window,text= "Upload", command=lambda:uploadFile(2))
+    inputUploadButton1 = ttk.Button(window,text= "Upload User 1", command=lambda:uploadFile(1))
+    inputUploadButton2 = ttk.Button(window,text= "Upload User 2", command=lambda:uploadFile(2))
 
     # Input Selection 1
     inputLabelType1 = tk.Label(window, text="Input Type User 1:")
