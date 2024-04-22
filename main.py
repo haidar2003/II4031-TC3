@@ -1,11 +1,17 @@
 import base64
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import json
 import os
 from rsa_encryption import *
 from pydantic import BaseModel
+
+origins = [
+    "http://localhost:80",
+    "http://localhost:5173",
+]
 
 current_user = 0
 
@@ -21,6 +27,14 @@ class UserData(BaseModel):
     private_key: Key
     partner_key: bool
 
+class FileMetadata(BaseModel):
+    output_file_name: str
+    output_file_extension: str
+
+class Text(BaseModel):
+    input_text: str
+
+
 users = {
     1: UserData(file_name='user_1', file_extension='txt', public_key=Key(key_type='', exponent=0, modulus=0), private_key=Key(key_type='', exponent=0, modulus=0), partner_key=False),
     2: UserData(file_name='user_2', file_extension='txt', public_key=Key(key_type='', exponent=0, modulus=0), private_key=Key(key_type='', exponent=0, modulus=0), partner_key=False)
@@ -34,6 +48,14 @@ USER_DATA_FILE = os.path.join(BASE_DIR, "users.json")
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.delete('/app/reset')
@@ -57,7 +79,7 @@ def get_users():
 def get_current_user():
     return current_user
 
-@app.get('/user/generate_key')
+@app.put('/user/generate_key')
 async def generate_user_key(user_id: int):
     global current_user
     global users
@@ -94,7 +116,7 @@ async def generate_user_key(user_id: int):
     with open(private_key_file, 'w') as f:
         json.dump(private_key_dict, f)
 
-    return {'public_key': public_key_dict, 'private_key': private_key_dict, 'user': users[user_id]}
+    return {'user': users[user_id]}
 
 @app.get('/user/{user_id}/public_key')
 async def download_user_public_key(user_id: int):
@@ -139,7 +161,6 @@ async def download_user_private_key(user_id: int):
     with open(private_key_file, 'rb') as f: 
         return FileResponse(private_key_file, media_type='application/octet-stream', filename=f"user_{user_id}_private_key.pri")
 
-
 @app.put('/user/{sender_user_id}/send_key')
 async def send_user_public_key(sender_user_id: int):
     global current_user
@@ -158,8 +179,10 @@ async def send_user_public_key(sender_user_id: int):
     elif sender_user_id == 2:
         users[1].partner_key = True
 
+    return {'user': users[(sender_user_id % 2) + 1]}
+
 @app.put('/user/{user_id}/file/metadata')
-async def change_user_file_metadata(user_id: int, output_file_name: str, output_file_extension: str):
+async def change_user_file_metadata(user_id: int, metadata: FileMetadata):
     global current_user
     global users
 
@@ -168,8 +191,10 @@ async def change_user_file_metadata(user_id: int, output_file_name: str, output_
     
     user = users[user_id]
 
-    user.file_name = output_file_name
-    user.file_extension = output_file_extension
+    user.file_name = metadata.output_file_name
+    user.file_extension = metadata.output_file_extension
+
+    return {'user': users[user_id]}
 
 @app.put('/user/change_user')
 async def change_user(target_user: int):
@@ -180,6 +205,8 @@ async def change_user(target_user: int):
         raise HTTPException(status_code=404, detail=f'User {target_user} tidak ditemukan')
 
     current_user = target_user
+
+    return current_user
 
 @app.post('/rsa/file/encrypt')
 async def encrypt_file(file: UploadFile = File(...)):
@@ -276,7 +303,7 @@ async def decrypt_file(file: UploadFile = File(...)):
 
 
 @app.post('/rsa/encrypt')
-async def encrypt_string(string: str):
+async def encrypt_string(string: Text):
     global current_user
     global users
 
@@ -305,7 +332,7 @@ async def encrypt_string(string: str):
     
     key_json = json.dumps({'key_type': public_key.key_type, 'exponent': public_key.exponent, 'modulus': public_key.modulus})
 
-    string_encrypted = rsa_string_encrypt(string, key_json, 1) # string
+    string_encrypted = rsa_string_encrypt(string.input_text, key_json, 1) # string
 
     new_output_file_name = f'{output_file_name}.txt'
 
@@ -318,7 +345,7 @@ async def encrypt_string(string: str):
 
 
 @app.post('/rsa/decrypt')
-async def decrypt_string(string: str):
+async def decrypt_string(string: Text):
     global current_user
     global users
     
@@ -347,7 +374,7 @@ async def decrypt_string(string: str):
     
     key_json = json.dumps({'key_type': private_key.key_type, 'exponent': private_key.exponent, 'modulus': private_key.modulus})
 
-    string_decrypted = rsa_string_decrypt(string, key_json, 1) # string
+    string_decrypted = rsa_string_decrypt(string.input_text, key_json, 1) # string
 
     new_output_file_name = f'{output_file_name}.txt'
 
@@ -358,6 +385,181 @@ async def decrypt_string(string: str):
 
     return FileResponse(path=SAVE_FILE_PATH, media_type="application/octet-stream", filename=new_output_file_name)
 
+
+@app.post('/rsa/file/encryptB64')
+async def encrypt_file(file: UploadFile = File(...)):
+    global current_user
+    global users
+    
+    if current_user == 0:
+        raise HTTPException(status_code=400, detail='Current User belum diatur')
+    
+    file_bytes = await file.read()
+
+    user = users[current_user]
+
+    output_file_name = user.file_name
+
+    output_file_extension = user.file_extension
+
+
+    if not file_bytes:
+        raise HTTPException(status_code=400, detail='File bermasalah')
+    
+    if not user.partner_key:
+        raise HTTPException(status_code=400, detail=f'User {(current_user % 2) + 1} (partner) belum mengirim kunci')
+    
+    if output_file_name == '' or output_file_extension == '':
+        raise HTTPException(status_code=400, detail=f'User {current_user} belum memasukkan metadata file output')
+    
+
+    public_key = users[(current_user % 2) + 1].public_key
+
+    # Public key merupakan public key partner, bukan current user
+    
+
+    key_json = json.dumps({'key_type': public_key.key_type, 'exponent': public_key.exponent, 'modulus': public_key.modulus})
+    
+    file_decoded = file_bytes.decode('latin1')
+
+    file_decoded_encrypted = rsa_string_encrypt(file_decoded, key_json, 1) # string
+
+    base64_encoded_data = base64.b64encode(file_decoded_encrypted.encode('latin1')).decode('latin1')
+
+    return JSONResponse(
+        content={
+            'filename': f'{output_file_name}.{output_file_extension}',
+            'base64_data': base64_encoded_data
+        }
+    )
+
+
+@app.post('/rsa/file/decryptB64')
+async def decrypt_file(file: UploadFile = File(...)):
+    global current_user
+    global users
+    
+    if current_user == 0:
+        raise HTTPException(status_code=400, detail='Current User belum diatur')
+    
+    file_bytes = await file.read()
+
+    user = users[current_user]
+
+    private_key = user.private_key
+
+    output_file_name = user.file_name
+
+    output_file_extension = user.file_extension
+
+    # Private key merupakan private key current user
+
+    if not file_bytes:
+        raise HTTPException(status_code=400, detail='File bermasalah')
+    
+    if private_key.key_type == '':
+        raise HTTPException(status_code=400, detail=f'User {current_user} belum memiliki kuci')
+    
+    if output_file_name == '' or output_file_extension == '':
+        raise HTTPException(status_code=400, detail=f'User {current_user} belum memasukkan metadata file output')
+
+    
+    key_json = json.dumps({'key_type': private_key.key_type, 'exponent': private_key.exponent, 'modulus': private_key.modulus})
+    
+    file_decoded = file_bytes.decode('latin1')
+
+    file_decoded_decrypted = rsa_string_decrypt(file_decoded, key_json, 1) # string
+
+    base64_encoded_data = base64.b64encode(file_decoded_decrypted.encode('latin1')).decode('latin1')
+
+    return JSONResponse(
+        content={
+            'filename': f'{output_file_name}.{output_file_extension}',
+            'base64_data': base64_encoded_data
+        }
+    )
+
+
+@app.post('/rsa/encryptB64')
+async def encrypt_string(string: Text):
+    global current_user
+    global users
+
+    if current_user == 0:
+        raise HTTPException(status_code=400, detail='Current User belum diatur')
+    
+
+    user = users[current_user]
+
+    output_file_name = user.file_name
+
+    output_file_extension = user.file_extension
+
+    # Private key merupakan private key current user
+
+    if not string or string == '':
+        raise HTTPException(status_code=400, detail='String bermasalah')
+    
+    if not user.partner_key:
+        raise HTTPException(status_code=400, detail=f'User {(current_user % 2) + 1} (partner) belum mengirim kunci')
+    
+    if output_file_name == '' or output_file_extension == '':
+        raise HTTPException(status_code=400, detail=f'User {current_user} belum memasukkan metadata file output')
+
+    public_key = users[(current_user % 2) + 1].public_key
+    
+    key_json = json.dumps({'key_type': public_key.key_type, 'exponent': public_key.exponent, 'modulus': public_key.modulus})
+
+    string_encrypted = rsa_string_encrypt(string.input_text, key_json, 1) # string
+
+    base64_encoded_data = base64.b64encode(string_encrypted.encode('latin1')).decode('latin1')
+
+    return JSONResponse(
+        content={
+            'encrypted_string': base64_encoded_data
+        }
+    )
+
+
+@app.post('/rsa/decryptB64')
+async def decrypt_string(string: Text):
+    global current_user
+    global users
+    
+    if current_user == 0:
+        raise HTTPException(status_code=400, detail='Current User belum diatur')
+
+    user = users[current_user]
+
+    private_key = user.private_key
+
+    output_file_name = user.file_name
+
+    output_file_extension = user.file_extension
+
+    # Private key merupakan private key current user
+
+    if not string or string == '':
+        raise HTTPException(status_code=400, detail='String bermasalah')
+    
+    if private_key.key_type == '':
+        raise HTTPException(status_code=400, detail=f'User {current_user} belum memiliki kuci')
+    
+    if output_file_name == '' or output_file_extension == '':
+        raise HTTPException(status_code=400, detail=f'User {current_user} belum memasukkan metadata file output')
+
+    
+    key_json = json.dumps({'key_type': private_key.key_type, 'exponent': private_key.exponent, 'modulus': private_key.modulus})
+
+    string_decrypted = rsa_string_decrypt(string.input_text, key_json, 1) # string
+
+    base64_encoded_data = base64.b64encode(string_decrypted.encode('latin1')).decode('latin1')
+
+    return JSONResponse(
+        content={
+            'encrypted_string': base64_encoded_data
+        }
+    )
 
 # @app.post('/rsa/string/encrypt')
 # async def encrypt_file(string: str, key: Key, output_file_name: str, output_file_extension: str):
