@@ -98,7 +98,7 @@ def main():
     window.title("RSA CHAT GUI")
     defaultEncoding = "latin1"
 
-    window_width = 1500
+    window_width = 1600
     window_height = 800
     
     window.minsize(window_width, window_height)
@@ -117,6 +117,12 @@ def main():
     user1_know = False
     user2_know = False
 
+    keyLabel = tk.Label(window, text="User 1 belum mempunyai key")
+    keyLabel.grid(row=0, column=1, pady=10)
+
+    keyLabel = tk.Label(window, text="User 2 belum mempunyai key")
+    keyLabel.grid(row=0, column=5, pady=10)
+
     def keyGen(user):
         nonlocal private_user1
         nonlocal public_user1
@@ -127,11 +133,39 @@ def main():
 
         if user == 1:
             public_user1, private_user1 = generate_key(10, 10000000)
-            user2_know =False
+            user2_know = False
+
+            public_key_data = json.loads(public_user1)
+            private_key_data = json.loads(private_user1)
+
+            pub_exponent = public_key_data["exponent"]
+            pub_modulus = public_key_data["modulus"]
+            pri_exponent = private_key_data["exponent"]
+            pri_modulus = private_key_data["modulus"]
+
+            formatted_pub = f"PUB|e:{pub_exponent}|n:{pub_modulus}"
+            formatted_pri = f"PRI|d:{pri_exponent}|n:{pri_modulus}"
+
+            keyLabel = tk.Label(window, text=f"{formatted_pub} - {formatted_pri}")
+            keyLabel.grid(row=0, column=1, pady=10)
 
         elif user == 2:
             public_user2, private_user2 = generate_key(10, 10000000)
             user1_know = False
+
+            public_key_data = json.loads(public_user2)
+            private_key_data = json.loads(private_user2)
+
+            pub_exponent = public_key_data["exponent"]
+            pub_modulus = public_key_data["modulus"]
+            pri_exponent = private_key_data["exponent"]
+            pri_modulus = private_key_data["modulus"]
+
+            formatted_pub = f"PUB|e:{pub_exponent}|n:{pub_modulus}"
+            formatted_pri = f"PRI|d:{pri_exponent}|n:{pri_modulus}"
+
+            keyLabel = tk.Label(window, text=f"{formatted_pub} - {formatted_pri}")
+            keyLabel.grid(row=0, column=5, pady=10)
 
     def sendKey(user):
         nonlocal user1_know
@@ -174,14 +208,14 @@ def main():
 
     # USER 1
     keyLabel = tk.Label(window, text="User 1")
-    keyLabel.grid(row=0, column=1, pady=10)
+    keyLabel.grid(row=0, column=0, pady=10)
 
     keyLabel = tk.Label(window, text="User 1 Key : ")
     keyLabel.grid(row=1, column=0, pady=10)
     
     keyButton = ttk.Button(window, text="Generate Key", command=lambda: keyGen(1))
     keyButton.grid(row=1, column=1, padx = 5, pady=11)
-    sendKeyButton = ttk.Button(window, text="Send Key", command=lambda: sendKey(1))
+    sendKeyButton = ttk.Button(window, text="Send Key To User 2", command=lambda: sendKey(1))
     sendKeyButton.grid(row=1, column=2, padx = 5, pady=11)
     savePubButton = ttk.Button(window, text="Save Public Key", command=lambda: save_public(1))
     savePubButton.grid(row=2, column=1, padx = 5, pady=12)
@@ -190,14 +224,14 @@ def main():
     
     # USER 2
     keyLabel = tk.Label(window, text="User 2")
-    keyLabel.grid(row=0, column=5, pady=10)
+    keyLabel.grid(row=0, column=4, pady=10)
 
     keyLabel = tk.Label(window, text="User 2 Key : ")
     keyLabel.grid(row=1, column=4, pady=10)
     
     keyButton = ttk.Button(window, text="Generate Key", command=lambda: keyGen(2))
     keyButton.grid(row=1, column=5, padx = 5, pady=11)
-    sendKeyButton = ttk.Button(window, text="Send Key", command=lambda: sendKey(2))
+    sendKeyButton = ttk.Button(window, text="Send Key To User 1", command=lambda: sendKey(2))
     sendKeyButton.grid(row=1, column=6, padx = 5, pady=11)
     savePubButton = ttk.Button(window, text="Save Public Key", command=lambda: save_public(2))
     savePubButton.grid(row=2, column=5, padx = 5, pady=12)
@@ -252,6 +286,8 @@ def main():
             
     def handle_encrypt(target64, inputType, input, key, user):
         print(target64, inputType, input, key, user)
+        nonlocal user1_know
+        nonlocal user2_know
         nonlocal encryptedUser1
         nonlocal encryptedUser2
         nonlocal isResultBinary1
@@ -259,9 +295,15 @@ def main():
         nonlocal defaultEncoding
 
         if user == 1:
-            encryptedUser1, isResultBinary1 = start_encrypting(target64, inputType, input, key, defaultEncoding)
-        else:
-            encryptedUser2, isResultBinary2 = start_encrypting(target64, inputType, input, key, defaultEncoding)
+            if user1_know:
+                encryptedUser1, isResultBinary1 = start_encrypting(target64, inputType, input, key, defaultEncoding)
+            else:
+                print('User 2 belum mengirim kunci')
+        elif user == 2:
+            if user2_know:
+                encryptedUser2, isResultBinary2 = start_encrypting(target64, inputType, input, key, defaultEncoding)
+            else:
+                print('User 1 belum mengirim kunci')
 
     def handle_decrypt(target, inputType, input, key, user):
         nonlocal decryptedUser1
