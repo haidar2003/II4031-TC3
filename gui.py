@@ -260,6 +260,7 @@ def main():
                 return currentFile2
             
     def handle_encrypt(target64, inputType, input, key, user):
+        print(target64, inputType, input, key, user)
         nonlocal encryptedUser1
         nonlocal encryptedUser2
         nonlocal isResultBinary1
@@ -352,11 +353,11 @@ def main():
     # Input Selection 1
     inputLabelType1 = tk.Label(window, text="Input Type User 1:")
     inputLabelType1.grid(row=4, column=0, pady=10)
-    inputSelected = tk.StringVar()
+    inputSelected1 = tk.StringVar()
     inputList = ["Text", "File" ]
-    inputSelection1_1 = ttk.Radiobutton(window, text=inputList[0], variable= inputSelected, value=inputList[0], command=lambda: (on_input_type_change(inputUploadButton1,inputTextField1), inputTextField1.grid(row=6, column=1, pady=15, ipadx = 40), reset_label(window)))
+    inputSelection1_1 = ttk.Radiobutton(window, text=inputList[0], variable= inputSelected1, value=inputList[0], command=lambda: (on_input_type_change(inputUploadButton1,inputTextField1), inputTextField1.grid(row=6, column=1, pady=15, ipadx = 40), reset_label(window)))
     inputSelection1_1.grid(row=4, column=1, pady=10)
-    inputSelection2_1 = ttk.Radiobutton(window, text=inputList[1], variable= inputSelected, value=inputList[1], command=lambda: (on_input_type_change(inputTextField1,inputUploadButton1), inputUploadButton1.grid(row=6, column=1, pady=15, ipadx = 40)))
+    inputSelection2_1 = ttk.Radiobutton(window, text=inputList[1], variable= inputSelected1, value=inputList[1], command=lambda: (on_input_type_change(inputTextField1,inputUploadButton1), inputUploadButton1.grid(row=6, column=1, pady=15, ipadx = 40)))
     inputSelection2_1.grid(row=5, column=1, pady=15)
 
     inputLabelInput1 = tk.Label(window, text="Input User 1:")
@@ -365,28 +366,28 @@ def main():
     # Input Selection 2
     inputLabelType1 = tk.Label(window, text="Input Type User 2:")
     inputLabelType1.grid(row=4, column=4, pady=10)
-    inputSelected = tk.StringVar()
+    inputSelected2 = tk.StringVar()
     inputList = ["Text", "File" ]
-    inputSelection1_2 = ttk.Radiobutton(window, text=inputList[0], variable= inputSelected, value=inputList[0], command=lambda: (on_input_type_change(inputUploadButton2,inputTextField2), inputTextField2.grid(row=6, column=5, pady=15, ipadx = 40), reset_label(window)))
+    inputSelection1_2 = ttk.Radiobutton(window, text=inputList[0], variable= inputSelected2, value=inputList[0], command=lambda: (on_input_type_change(inputUploadButton2,inputTextField2), inputTextField2.grid(row=6, column=5, pady=15, ipadx = 40), reset_label(window)))
     inputSelection1_2.grid(row=4, column=5, pady=10)
-    inputSelection2_2 = ttk.Radiobutton(window, text=inputList[1], variable= inputSelected, value=inputList[1], command=lambda: (on_input_type_change(inputTextField2,inputUploadButton2), inputUploadButton2.grid(row=6, column=5, pady=15, ipadx = 40)))
+    inputSelection2_2 = ttk.Radiobutton(window, text=inputList[1], variable= inputSelected2, value=inputList[1], command=lambda: (on_input_type_change(inputTextField2,inputUploadButton2), inputUploadButton2.grid(row=6, column=5, pady=15, ipadx = 40)))
     inputSelection2_2.grid(row=5, column=5, pady=15)
 
     inputLabelInput2 = tk.Label(window, text="Input User 2:")
     inputLabelInput2.grid(row=6, column=4, pady=5, ipadx = 40)
 
     # Encrypt Button
-    encryptButton1 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox641, inputSelected.get(), handle_input(inputSelected.get(), 1), public_user2, 1))
+    encryptButton1 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox641, inputSelected1.get(), handle_input(inputSelected1.get(), 1), public_user2, 1))
     encryptButton1.grid(row=8, column=1, pady=3)
 
-    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox642, inputSelected.get(), handle_input(inputSelected.get(), 2), public_user1, 2))
+    encryptButton2 = ttk.Button(window, text="Encrypt and Send", command=lambda: handle_encrypt(textBox642, inputSelected1.get(), handle_input(inputSelected2.get(), 2), public_user1, 2))
     encryptButton2.grid(row=8, column=5, pady=3)
 
     # Decrypt Button
-    DecryptButton1 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox1, inputSelected.get(), handle_input(inputSelected.get(), 1), private_user1, 1))
+    DecryptButton1 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox1, inputSelected1.get(), handle_input(inputSelected1.get(), 1), private_user1, 1))
     DecryptButton1.grid(row=10, column=1, pady=3)
 
-    DecryptButton2 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox2, inputSelected.get(), handle_input(inputSelected.get(), 2), private_user2, 2))
+    DecryptButton2 = ttk.Button(window, text="Decrypt", command=lambda: handle_decrypt(textBox2, inputSelected2.get(), handle_input(inputSelected2.get(), 2), private_user2, 2))
     DecryptButton2.grid(row=10, column=5, pady=3)
 
 
